@@ -14,8 +14,15 @@ import android.widget.Button;
 
 /**
  * 减少服务被杀概率
- * 1、提升进程优先级
- * 2、创建前台进程
+ * 1、提升server进程优先级,在AndroidManifest.xml文件中对于intent-filter
+ * 可以通过android:priority = "1000"这个属性设置最高优先级，1000是最高值
+ * ，如果数字越小则优先级越低，同时适用于广播。
+ * 2、使用startForeground(int, Notification)方法来将service设置为前台状态
+ * 3、onStartCommand方法，返回START_STICKY
+ * 4、service +broadcast 方式
+ * 5、清单文件的 Application 标签添加 android:persistent="true" 属性，
+ * 同时符合FLAG_SYSTEM(app放在/system/app目录)及FLAG_PERSISTENT(android:persistent="true")
+ * 才不会被lowmemorykiller处理，单设置该属性无效。
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private Button btn_start,btn_close,btn_bind,btn_unbind;

@@ -60,11 +60,18 @@ public class ForegroundService extends Service {
         super.onDestroy();
         // 销毁一些不再使用的资源
         Log.d(TAG, "onDestroy() executed");
+        // 注意在onDestroy里还需要stopForeground(true);
+        stopForeground(true);
+        // 销毁时发送广播，重新启动Server
+        Intent intent = new Intent("com.ForegroundService.destroy");
+        sendBroadcast(intent);
+        super.onDestroy();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand() executed");
+        flags = START_STICKY;
         return super.onStartCommand(intent, flags, startId);
     }
 

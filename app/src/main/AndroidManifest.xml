@@ -7,7 +7,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:persistent="true">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +24,12 @@
         <service
             android:name=".ForegroundService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true">
+            <intent-filter android:priority="1000" >
+                <action android:name="com.example.servicetest.ForegroundService" />
+            </intent-filter>
+        </service>
+        <!-- android:priority="1000" 提升service进程优先级-->
         <service
             android:name=".RemoteService"
             android:enabled="true"
@@ -35,6 +41,15 @@
         </service>
         <!--RemoteService 可以响应带有com.example.servicetest.MyAIDLService这个action的Intent,真正实现跨应用进程通讯 -->
         <!--android:process=":remote" 将一个普通的Service转换成远程Service-->
+
+        <receiver android:name=".MyBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="com.ForegroundService.destroy" />
+            </intent-filter>
+        </receiver>
+        <!--当接收到这些广播时检查服务是否启动，没有就自启-->
     </application>
 
 </manifest>
