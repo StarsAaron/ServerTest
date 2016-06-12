@@ -29,6 +29,8 @@ import java.util.logging.Handler;
  * 5、清单文件的 Application 标签添加 android:persistent="true" 属性，
  * 同时符合FLAG_SYSTEM(app放在/system/app目录)及FLAG_PERSISTENT(android:persistent="true")
  * 才不会被lowmemorykiller处理，单设置该属性无效。
+ *
+ * http://blog.csdn.net/u012861467/article/details/51646935
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     public static final String TAG = "MainActivity";
