@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -25,32 +26,34 @@ public class ForegroundService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         Notification notification = null;
-        // 低于 API 11 写法
-//        notification = new Notification(R.mipmap.ic_launcher,"有通知到来", System.currentTimeMillis());
-//        notification.setLatestEventInfo(this, "这是通知的标题", "这是通知的内容",pendingIntent);
-
-        // 高于 API 11 低于 API 16
-        Notification.Builder builder = new Notification.Builder(this)
-                .setAutoCancel(true)
-                .setContentTitle("有通知到来")
-                .setContentText("describe")
-                .setContentIntent(pendingIntent)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setWhen(System.currentTimeMillis())
-                .setOngoing(true);
-        notification = builder.getNotification();
-
-        // 高于 API 16
-//        notification = new Notification.Builder(this)
-//                .setAutoCancel(true)
-//                .setContentTitle("有通知到来")
-//                .setContentText("describe")
-//                .setContentIntent(pendingIntent)
-//                .setSmallIcon(R.mipmap.ic_launcher)
-//                .setWhen(System.currentTimeMillis())
-//                .setOngoing(true)
-//                .build();
-
+//        // 低于 API 11 写法
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+//            notification = new Notification(R.mipmap.ic_launcher, "有通知到来", System.currentTimeMillis());
+//            notification.setLatestEventInfo(this, "这是通知的标题", "这是通知的内容", pendingIntent);
+//        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
+            // 高于 API 11 低于 API 16
+            Notification.Builder builder = new Notification.Builder(this)
+                        .setAutoCancel(true)
+                        .setContentTitle("有通知到来")
+                        .setContentText("describe")
+                        .setContentIntent(pendingIntent)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setWhen(System.currentTimeMillis())
+                        .setOngoing(true);
+            notification = builder.getNotification();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            // 高于 API 16
+            notification = new Notification.Builder(this)
+                    .setAutoCancel(true)
+                    .setContentTitle("有通知到来")
+                    .setContentText("describe")
+                    .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setWhen(System.currentTimeMillis())
+                    .setOngoing(true)
+                    .build();
+        }
         // 调用startForeground()方法就可以让MyService变成一个前台Service
         startForeground(1, notification);
     }

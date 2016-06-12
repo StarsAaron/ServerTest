@@ -9,8 +9,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Handler;
 
 /**
  * 减少服务被杀概率
@@ -25,6 +31,7 @@ import android.widget.Button;
  * 才不会被lowmemorykiller处理，单设置该属性无效。
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    public static final String TAG = "MainActivity";
     private Button btn_start,btn_close,btn_bind,btn_unbind;
     private MyService myService;
     private ServiceConnection serviceConnection;
@@ -36,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("MyService", "MainActivity thread id is " + Thread.currentThread().getId());
+        Log.d(TAG, "MainActivity thread id is " + Thread.currentThread().getId());
 
         btn_start = (Button)findViewById(R.id.btn_start);
         btn_close = (Button)findViewById(R.id.btn_close);
@@ -48,18 +55,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_unbind.setOnClickListener(this);
 
         // 简单服务
-//        intent = new Intent(MainActivity.this,MyService.class);
+        intent = new Intent(MainActivity.this,MyService.class);
         // 前台服务
 //        intent = new Intent(MainActivity.this,ForegroundService.class);
         // 远程服务 AIDL 跨进程通讯
-        intent = new Intent(MainActivity.this,RemoteService.class);
+//        intent = new Intent(MainActivity.this,RemoteService.class);
 
         serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 // 简单服务
-//                myBinder = (MyService.MyBinder) iBinder;
-//                myBinder.startDownload();
+                myBinder = (MyService.MyBinder) iBinder;
+                myBinder.startDownload();
 
                 //AIDL 跨进程通讯
                 iMyAidlService = IMyAidlInterface.Stub.asInterface(iBinder);
@@ -90,20 +97,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startService(intent);//startService 开启的服务要使用stopService 关闭
                 break;
             case R.id.btn_close:
-                Log.d("MyService", "click Stop Service button");
+                Log.d(TAG, "click Stop Service button");
                 stopService(intent);
                 break;
             case R.id.btn_bind:
                 bindService(intent,serviceConnection,BIND_AUTO_CREATE); //bindService 要记得unbindService
 
-//                // 跨应用调用写法
-//                intent = new Intent("com.example.servicetest.MyAIDLService");
-//                bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+//                // 跨应用调用写法，隐式
+                intent = new Intent("com.example.servicetest.MyAIDLService");
+                bindService(intent, serviceConnection, BIND_AUTO_CREATE);
                 break;
             case R.id.btn_unbind:
-                Log.d("MyService", "click Unbind Service button");
+                Log.d(TAG, "click Unbind Service button");
                 unbindService(serviceConnection);
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "MainActivity destroy");
+        super.onDestroy();
+    }
+
+    private boolean mIsExit = false;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mIsExit) {
+                this.finish();
+            } else {
+                Toast.makeText(this, "再按一次退出", Toast.LENGTH_SHORT).show();
+                mIsExit = true;
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        mIsExit = false;
+                    }
+                },2000);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
