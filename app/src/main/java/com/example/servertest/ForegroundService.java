@@ -65,7 +65,7 @@ public class ForegroundService extends Service {
         //服务开启模式要设置为Intent.FLAG_ACTIVITY_NEW_TASK，避免重复创建Service
         mPendingIntent = PendingIntent.getService(this, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
         long now = System.currentTimeMillis();
-        //6 s 间隔
+        //60 s 间隔
         mAlarmManager.setInexactRepeating(AlarmManager.RTC, now, 60000, mPendingIntent);
 
     }
