@@ -29,7 +29,7 @@ import java.util.logging.Handler;
  * 5、清单文件的 Application 标签添加 android:persistent="true" 属性，
  * 同时符合FLAG_SYSTEM(app放在/system/app目录)及FLAG_PERSISTENT(android:persistent="true")
  * 才不会被lowmemorykiller处理，单设置该属性无效。
- *
+ * 6、AlarmManager 重复定时开启服务，服务开启模式要设置为Intent.FLAG_ACTIVITY_NEW_TASK，避免重复创建Service
  * http://blog.csdn.net/u012861467/article/details/51646935
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -57,9 +57,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_unbind.setOnClickListener(this);
 
         // 简单服务
-        intent = new Intent(MainActivity.this,MyService.class);
+//        intent = new Intent(MainActivity.this,MyService.class);
         // 前台服务
 //        intent = new Intent(MainActivity.this,ForegroundService.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         // 远程服务 AIDL 跨进程通讯
 //        intent = new Intent(MainActivity.this,RemoteService.class);
 

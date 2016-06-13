@@ -1,10 +1,10 @@
 package com.example.servertest;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -14,6 +14,8 @@ import android.util.Log;
  */
 public class ForegroundService extends Service {
     public static final String TAG = "ForegroundService";
+    private AlarmManager mAlarmManager = null;
+    private PendingIntent mPendingIntent = null;
 
     @Override
     public void onCreate() {
@@ -56,6 +58,16 @@ public class ForegroundService extends Service {
         }
         // 调用startForeground()方法就可以让MyService变成一个前台Service
         startForeground(1, notification);
+
+        //---------------- 开启重复闹钟，不停开启服务
+        Intent intent = new Intent(getApplicationContext(), ForegroundService.class);
+        mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        //服务开启模式要设置为Intent.FLAG_ACTIVITY_NEW_TASK，避免重复创建Service
+        mPendingIntent = PendingIntent.getService(this, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+        long now = System.currentTimeMillis();
+        //6 s 间隔
+        mAlarmManager.setInexactRepeating(AlarmManager.RTC, now, 60000, mPendingIntent);
+
     }
 
     @Override
